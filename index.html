@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    제목: <input type="text" name="title" /><br />
+    내용: <textarea name="content"></textarea><br />
+    작성자: <input type="text" name="author" />
+    <button onclick="addBoard()">등록</button>
+
+    <hr />
+    <button onclick="modifyBoard()">수정</button>
+    <!-- 3번글 : 제목(3번글입니다), 내용(3번글내용입니다) -->
+    <script>
+      async function addBoard() {
+        let title = document.querySelector('input[name="title"]').value;
+        let content = document.querySelector('textarea[name="content"]').value;
+        let author = document.querySelector('input[name="author"]').value;
+        let response = await fetch("http://localhost:3000/board", {
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: title,
+            content: content,
+            author: author,
+          }),
+        });
+        let result = await response.json();
+        console.log(result);
+      }
+
+      async function modifyBoard() {
+        let response = await fetch("http://localhost:3000/board", {
+          method: "put",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: "3번글입니다",
+            content: "3번글내용입니다",
+            id: 3,
+          }),
+        });
+        let result = await response.json();
+        console.log(result);
+      }
+    </script>
+  </body>
+</html>
