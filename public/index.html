@@ -14,12 +14,28 @@
     <hr />
     <button onclick="modifyBoard()">수정</button>
     <!-- 3번글 : 제목(3번글입니다), 내용(3번글내용입니다) -->
+
+    <!-- 11월20일 -->
+    <div class="boardList">
+      <table>
+        <thead>
+          <tr>
+            <th>글번호</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일시</th>
+          </tr>
+        </thead>
+        <tbody id="list"></tbody>
+      </table>
+    </div>
+
     <script>
       async function addBoard() {
         let title = document.querySelector('input[name="title"]').value;
         let content = document.querySelector('textarea[name="content"]').value;
         let author = document.querySelector('input[name="author"]').value;
-        let response = await fetch("http://localhost:3000/board", {
+        let response = await fetch("/board", {
           method: "post",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -45,6 +61,32 @@
         let result = await response.json();
         console.log(result);
       }
+
+      // 11월20일.
+      async function boardList() {
+        let response = await fetch("/boards/2");
+        let result = await response.json(); // 자바스크립트 객체로 생성.
+        console.log(result);
+        result.forEach((board) => {
+          let { BOARD_ID, TITLE, CONTENT, AUTHOR, CREATED_AT } = board;
+          let tr = document.createElement("tr");
+          let cdate = new Date(CREATED_AT);
+          cdate =
+            cdate.getFullYear() +
+            "-" +
+            (cdate.getMonth() + 1) +
+            "-" +
+            cdate.getDate();
+          // 화면에 출력하기 위한 항목.
+          [BOARD_ID, TITLE, AUTHOR, cdate].forEach((prop) => {
+            let td = document.createElement("td");
+            td.innerHTML = prop;
+            tr.appendChild(td);
+          });
+          document.querySelector("#list").appendChild(tr);
+        });
+      }
+      boardList();
     </script>
   </body>
 </html>

@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("./db.js");
 const cors = require("cors");
+const path = require("path"); // path 모듈 추가 11월20일.
 
 const app = express(); // 웹서버기능.
 const port = 3000;
@@ -9,17 +10,30 @@ app.use(cors()); // cors 원칙.
 app.use(express.json()); // body-parser json 처리.
 app.use(express.urlencoded()); // key=val&key=val&.....
 
+// public 폴더 내의 파일들을 / 경로를 통해 접근 가능하게 합니다.(설정추가 11월20일)
+app.use(express.static(path.join(__dirname, "public")));
+
 // url : 실행함수 => 라우팅.
 app.get("/", (req, res) => {
   res.send("/ 호출됨.");
 });
 
 // board 목록 조회.
-app.get("/boards", async (req, res) => {
+app.get("/boards/:page", async (req, res) => {
+  let { page } = req.params; // 객체 분해.
   let connection;
   try {
     connection = await db.getConnection();
-    let result = await connection.execute(`select * from board order by 1`);
+    let result = await connection.execute(
+      `SELECT b.*
+       FROM (SELECT rownum rn, a.*
+             FROM (SELECT *
+                   FROM board
+                   ORDER BY 1) a ) b
+       WHERE b.rn > (:page - 1) * 5
+       AND   b.rn <= (:page * 5)`,
+      [page, page]
+    );
     console.log(result.rows);
     //res.send("조회완료"); // txt, html....
     res.json(result.rows); // json 문자열로 응답.

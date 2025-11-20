@@ -1,6 +1,9 @@
 // db.js
 const oracledb = require("oracledb");
 
+// 결과를 객체 형태로 받기 위해 설정 (설정추가 11월20일)
+oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+
 // db setting.
 const dbConfig = {
   user: "scott",
